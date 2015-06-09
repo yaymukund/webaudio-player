@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+while true
+do
+  echo "Rebuilding";
+  broccoli build dist;
+  rm -rf server/public/dist;
+  mv dist server/public/dist;
+  sleep 2;
+done
