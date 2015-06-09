@@ -1,10 +1,10 @@
-let RSVP;
+let libs = {};
 
 let configure = function(options) {
-  RSVP = options.RSVP;
+  libs.RSVP = options.RSVP;
 };
 
 export {
-  RSVP,
-  configure
+  configure,
+  libs
 };

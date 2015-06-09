@@ -7,9 +7,13 @@
     <script src="http://rsvpjs-builds.s3.amazonaws.com/rsvp-latest.js"></script>
     <script src="dist/webaudio-player.js"></script>
     <script>
-      require('webaudio-player/settings').configure({
-        RSVP: RSVP
-      });
+      var configure = require('webaudio-player/settings').configure;
+      configure({ RSVP: RSVP });
+
+      var Player = require('webaudio-player/player').default,
+          player = new Player();
+
+      player.play('test.mp3');
     </script>
   </head>
   <body>
