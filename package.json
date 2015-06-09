@@ -18,6 +18,7 @@
     "broccoli-babel-transpiler": "^5.1.1",
     "broccoli-es6modules": "^0.6.1",
     "broccoli-funnel": "^0.2.3",
-    "broccoli-sourcemap-concat": "^0.4.4"
+    "broccoli-sourcemap-concat": "^0.4.4",
+    "express": "^4.12.4"
   }
 }
