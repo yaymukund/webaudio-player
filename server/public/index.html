@@ -10,10 +10,10 @@
       var configure = require('webaudio-player/settings').configure;
       configure({ RSVP: RSVP });
 
-      var Player = require('webaudio-player/player').default,
-          player = new Player();
+      var Controls = require('webaudio-player/controls').default,
+          controls = new Controls();
 
-      player.play('test.mp3');
+      controls.play('test.mp3');
     </script>
   </head>
   <body>
