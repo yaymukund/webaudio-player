@@ -18,6 +18,10 @@ export default class Cache {
   }
 
   set(k, v) {
+    if (this.cache.get(k)) {
+      return;
+    }
+
     this.cache.push({
       k: k,
       v: v
