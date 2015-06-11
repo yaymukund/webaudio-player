@@ -30,4 +30,8 @@ export default class Controls {
     this.setVolume(this.oldVolume || 1);
     this.oldVolume = null;
   }
+
+  preload(url) {
+    this.player.preload(url);
+  }
 }

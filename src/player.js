@@ -1,52 +1,63 @@
 import { libs } from './settings';
-
-let _fetch = function(url) {
-  let request = new XMLHttpRequest(),
-      deferred = libs.RSVP.defer();
-
-  request.open('GET', url, true);
-  request.responseType = 'arraybuffer';
-
-  request.onload = () => {
-    deferred.resolve(request.response);
-  };
-
-  request.onerror = () => {
-    let error = new Error(`Could not fetch url ${url}`);
-    deferred.reject(error);
-  };
-
-  request.send();
-  return deferred.promise;
-};
-
-let _decode = function(audioContext, arrayBuffer) {
-  let deferred = libs.RSVP.defer();
-
-  audioContext.decodeAudioData(arrayBuffer, (audioBuffer) => {
-    deferred.resolve(audioBuffer);
-  }, deferred.reject);
-
-  return deferred.promise;
-};
+import { fetch } from './request';
+import Cache from './cache';
 
 export default class Player {
   constructor() {
+    this.cache = new Cache();
     this.audioContext = new AudioContext();
     this.gainNode = this.audioContext.createGain();
     this.gainNode.gain.value = 1;
     this.gainNode.connect(this.audioContext.destination);
   }
 
+  _decode(arrayBuffer) {
+    let deferred = libs.RSVP.defer();
+
+    this.audioContext.decodeAudioData(
+      arrayBuffer,
+      deferred.resolve,
+      deferred.reject
+    );
+
+    return deferred.promise;
+  }
+
+  _play(audioBuffer, when=0) {
+    this._stop(when);
+    this.bufferSource = this.audioContext.createBufferSource();
+    this.bufferSource.buffer = audioBuffer;
+    this.bufferSource.connect(this.gainNode);
+    this.bufferSource.start(when);
+  }
+
+  _stop(when=0) {
+    if (this.bufferSource) {
+      this.bufferSource.stop(when);
+    }
+  }
+
   play(url, when=0) {
-    return _fetch(url).then(arrayBuffer => {
-      return _decode(this.audioContext, arrayBuffer);
-    }).then(audioBuffer => {
-      let source = this.audioContext.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(this.gainNode);
-      source.start(when);
-    });
+    let audioBuffer = this.cache.get(url);
+
+    if (audioBuffer) {
+      this._play(audioBuffer, when);
+      return;
+    }
+
+    fetch(url)
+      .then(this._decode.bind(this))
+      .then(audioBuffer => {
+        this._play(audioBuffer, when);
+      });
+  }
+
+  preload(url) {
+    fetch(url)
+      .then(this._decode.bind(this))
+      .then(audioBuffer => {
+        this.cache.set(url, audioBuffer);
+      });
   }
 
   pause() {
