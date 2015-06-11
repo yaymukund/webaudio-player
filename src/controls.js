@@ -5,8 +5,8 @@ export default class Controls {
     this.player = new Player();
   }
 
-  play(url, when=0) {
-    this.player.play(url, when);
+  play(url, when=0, offset=0) {
+    this.player.play(url, when, offset);
   }
 
   pause() {

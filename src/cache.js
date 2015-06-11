@@ -18,7 +18,7 @@ export default class Cache {
   }
 
   set(k, v) {
-    if (this.cache.get(k)) {
+    if (this.get(k)) {
       return;
     }
 

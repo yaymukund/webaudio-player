@@ -38,6 +38,9 @@ export default class Player {
     this.bufferSource.buffer = audioBuffer;
     this.bufferSource.connect(this.gainNode);
     this.bufferSource.start(when, offset);
+    this.bufferSource.onended = () => {
+      this.onended();
+    };
   }
 
   _stop(when=0) {
@@ -54,18 +57,18 @@ export default class Player {
     return Math.floor(this.track.duration);
   }
 
-  play(url, when=0) {
+  play(url, when=0, offset=0) {
     let audioBuffer = this.cache.get(url);
 
     if (audioBuffer) {
-      this._play(audioBuffer, when);
+      this._play(audioBuffer, when, offset);
       return;
     }
 
     fetch(url)
       .then(this._decode.bind(this))
       .then(audioBuffer => {
-        this._play(audioBuffer, when);
+        this._play(audioBuffer, when, offset);
       });
   }
 
