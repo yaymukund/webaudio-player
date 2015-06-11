@@ -34,4 +34,12 @@ export default class Controls {
   preload(url) {
     this.player.preload(url);
   }
+
+  getSeconds() {
+    return this.player.getSeconds();
+  }
+
+  getDuration() {
+    return this.player.getDuration();
+  }
 }

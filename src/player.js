@@ -9,6 +9,11 @@ export default class Player {
     this.gainNode = this.audioContext.createGain();
     this.gainNode.gain.value = 1;
     this.gainNode.connect(this.audioContext.destination);
+
+    this.track = {
+      // duration
+      // startedAt
+    };
   }
 
   _decode(arrayBuffer) {
@@ -23,18 +28,30 @@ export default class Player {
     return deferred.promise;
   }
 
-  _play(audioBuffer, when=0) {
+  _play(audioBuffer, when=0, offset=0) {
     this._stop(when);
+
+    this.track.duration = audioBuffer.duration;
+    this.track.startedAt = this.audioContext.currentTime - offset;
+
     this.bufferSource = this.audioContext.createBufferSource();
     this.bufferSource.buffer = audioBuffer;
     this.bufferSource.connect(this.gainNode);
-    this.bufferSource.start(when);
+    this.bufferSource.start(when, offset);
   }
 
   _stop(when=0) {
     if (this.bufferSource) {
       this.bufferSource.stop(when);
     }
+  }
+
+  getSeconds() {
+    return Math.floor(this.audioContext.currentTime - this.track.startedAt);
+  }
+
+  getDuration() {
+    return Math.floor(this.track.duration);
   }
 
   play(url, when=0) {
