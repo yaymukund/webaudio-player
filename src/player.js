@@ -46,4 +46,8 @@ export default class Player {
   seekToPercent(percent) {
     return this._player.seekToPercent(percent);
   }
+
+  on(name, fn) {
+    return this._player.on(name, fn);
+  }
 }

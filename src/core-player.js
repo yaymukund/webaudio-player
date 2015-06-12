@@ -9,11 +9,18 @@ export default class CorePlayer {
     this.gainNode = this.audioContext.createGain();
     this.gainNode.gain.value = 1;
     this.gainNode.connect(this.audioContext.destination);
+    this.__onended_callbacks = [];
 
     this.track = {
       // duration
       // startedAt
     };
+  }
+
+  on(name, fn) {
+    if (name === 'ended') {
+      this.__onended_callbacks.push(fn);
+    }
   }
 
   _decode(arrayBuffer) {
@@ -40,7 +47,7 @@ export default class CorePlayer {
     this.bufferSource.connect(this.gainNode);
     this.bufferSource.start(when, offset);
     this.bufferSource.onended = () => {
-      this.onended();
+      this.__onended_callbacks.forEach(cb => { cb(); });
     };
   }
 
