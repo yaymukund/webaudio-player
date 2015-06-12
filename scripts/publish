@@ -30,13 +30,13 @@ then
   exit 1;
 fi
 
-git checkout --detach master
+git checkout --orphan release
 rm -rf dist
-broccoli built dist
-git add -f dist/*.js
-git add -f dist/*.map
+broccoli build dist
+git reset
+git add -f dist
 git commit -m "Release $package_version"
 git tag $package_version
 git push origin $package_version
 echo "Tagged and pushed version $package_version";
-git checkout master
+git checkout -f master
