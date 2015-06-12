@@ -1,0 +1,39 @@
+#!/usr/bin/env zsh
+get_package_version() {
+  echo 'console.log(require("./package.json").version);' | node;
+}
+
+tag_exists() {
+  git rev-parse --verify -q $1 > /dev/null 2>&1;
+}
+
+package_version=$(get_package_version)
+
+read -q "REPLY?Do you want to tag and push version $package_version? (y/n) ";
+echo
+
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+  echo "You didn't confirm. Aborting...";
+  exit 1;
+fi
+
+if [[ -n $(git status -s) ]]
+then
+  echo 'You have uncommitted changes! Cannot proceed.';
+  exit 1;
+fi
+
+if tag_exists $package_version
+then
+  echo "Aborted because the tag \"$package_version\" already exists.";
+  exit 1;
+fi
+
+git checkout --detach master
+git commit -m "Release $package_version"
+git tag $package_version
+git push origin $package_version
+git checkout master
+
+echo "Tagged and pushed version $package_version";
