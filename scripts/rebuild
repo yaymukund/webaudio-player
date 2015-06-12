@@ -2,8 +2,7 @@
 while true
 do
   echo "Rebuilding";
-  broccoli build dist;
-  rm -rf server/public/dist;
-  mv dist server/public/dist;
+  rm -rf dist server/public/dist;
+  broccoli build dist
   sleep 2;
 done

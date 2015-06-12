@@ -50,10 +50,18 @@ export default class Player {
   }
 
   getSeconds() {
+    if (!this.track.startedAt) {
+      return 0;
+    }
+
     return Math.floor(this.audioContext.currentTime - this.track.startedAt);
   }
 
   getDuration() {
+    if (!this.track.duration) {
+      return 0;
+    }
+
     return Math.floor(this.track.duration);
   }
 
