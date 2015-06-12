@@ -1,3 +1,4 @@
+server/public/*.mp3
 dist/
 server/public/dist
 node_modules
