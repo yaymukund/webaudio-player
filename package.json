@@ -1,0 +1,24 @@
+{
+  "name": "webaudio-player",
+  "version": "0.0.3",
+  "description": "",
+  "main": "dist/webaudio-player.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "github/webaudio-player",
+  "author": "Mukund Lakshman",
+  "license": "GPL v3",
+  "bugs": {
+    "url": "https://github.com/yaymukund/webaudio-player/issues"
+  },
+  "homepage": "https://github.com/yaymukund/webaudio-player",
+  "private": true,
+  "devDependencies": {
+    "broccoli-babel-transpiler": "^5.1.1",
+    "broccoli-es6modules": "^0.6.1",
+    "broccoli-funnel": "^0.2.3",
+    "broccoli-sourcemap-concat": "^0.4.4",
+    "express": "^4.12.4"
+  }
+}
