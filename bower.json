@@ -7,6 +7,7 @@
   ],
   "description": "A player written with the webaudio api.",
   "main": "dist/webaudio-player.js",
+  "ignore": [],
   "keywords": [
     "webaudio",
     "player"
