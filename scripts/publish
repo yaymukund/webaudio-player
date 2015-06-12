@@ -40,3 +40,4 @@ git tag $package_version
 git push origin $package_version
 echo "Tagged and pushed version $package_version";
 git checkout -f master
+git br -D release
