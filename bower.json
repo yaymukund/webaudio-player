@@ -1,0 +1,16 @@
+{
+  "name": "webaudio-player",
+  "version": "0.0.6",
+  "homepage": "https://github.com/yaymukund/webaudio-player",
+  "authors": [
+    "Mukund Lakshman <yaymukund@gmail.com>"
+  ],
+  "description": "A player written with the webaudio api.",
+  "main": "dist/webaudio-player.js",
+  "ignore": [],
+  "keywords": [
+    "webaudio",
+    "player"
+  ],
+  "license": "GPL v2"
+}
