@@ -19,6 +19,7 @@ export default class XhrPlayer {
     this.destination = destination;
     this._cache = new Cache();
     this.__onended__callbacks = [];
+    this.startedAt = 0;
   }
 
   _play(buffer=null, offset=0) {
@@ -63,11 +64,6 @@ export default class XhrPlayer {
 
   getSeconds() {
     let duration = this.getDuration();
-
-    if (!this.startedAt || !duration) {
-      return 0;
-    }
-
     let since = Math.floor(this.context.currentTime - this.startedAt);
     return Math.min(since, duration);
   }
