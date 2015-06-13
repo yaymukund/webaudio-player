@@ -1,6 +1,7 @@
 import { libs } from './settings';
 import { fetch } from './request';
 import Cache from './cache';
+import { trigger } from './events';
 
 // play
 // getSeconds
@@ -11,14 +12,12 @@ import Cache from './cache';
 // getVolume
 // seekToPercent
 // isPaused
-// on('ended')
 
 export default class XhrPlayer {
   constructor(context, destination) {
     this.context = context;
     this.destination = destination;
     this._cache = new Cache();
-    this.__onended__callbacks = [];
     this.startedAt = 0;
   }
 
@@ -37,7 +36,9 @@ export default class XhrPlayer {
     this.source.connect(this.destination);
     this.source.start(0, offset);
     this.startedAt = this.context.currentTime - offset;
-    this.source.onended = this.__onended.bind(this);
+    this.source.onended = () => {
+      trigger('ended');
+    };
   }
 
   stop() {
@@ -107,15 +108,5 @@ export default class XhrPlayer {
 
   isCached(url) {
     return !!this._cache.get(url);
-  }
-
-  on(name, fn) {
-    if (name === 'ended') {
-      this.__onended__callbacks.push(fn);
-    }
-  }
-
-  __onended() {
-    this.__onended__callbacks.forEach(cb => { cb(); });
   }
 }

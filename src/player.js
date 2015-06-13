@@ -1,5 +1,6 @@
 import AudioPlayer from './audio-player';
 import XhrPlayer from './xhr-player';
+import * as events from './events';
 
 export default class Player {
   constructor() {
@@ -8,15 +9,12 @@ export default class Player {
     this.destination = this.context.createGain();
     this.destination.gain.value = 1;
     this.destination.connect(this.context.destination);
-    this.__onended__callbacks = [];
 
     this.players = {
       audio: new AudioPlayer(this.context, this.destination),
       xhr: new XhrPlayer(this.context, this.destination)
     };
 
-    this.players.audio.on('ended', this.__onended.bind(this));
-    this.players.xhr.on('ended', this.__onended.bind(this));
     this.player = this.players.audio;
   }
 
@@ -83,12 +81,6 @@ export default class Player {
   }
 
   on(name, fn) {
-    if (name === 'ended') {
-      this.__onended__callbacks.push(fn);
-    }
-  }
-
-  __onended() {
-    this.__onended__callbacks.forEach(cb => { cb(); });
+    events.on(name, fn);
   }
 }

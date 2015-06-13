@@ -1,3 +1,4 @@
+import { trigger } from './events';
 import { libs } from './settings';
 // play
 // getSeconds
@@ -9,7 +10,9 @@ export default class AudioPlayer {
     this.context = context;
     this.destination = destination;
     this.audio = new Audio();
-    this.__onended__callbacks = [];
+    this.audio.addEventListener('ended', () => {
+      trigger('ended');
+    });
   }
 
   _fetch(url) {
@@ -18,7 +21,6 @@ export default class AudioPlayer {
     this.url = url;
     this.audio.load();
 
-    this.audio.addEventListener('ended', this.__onended.bind(this));
     this.audio.addEventListener('canplaythrough', () => {
       deferred.resolve(this.audio);
     });
@@ -57,15 +59,5 @@ export default class AudioPlayer {
 
   seekToPercent(percent) {
     this.audio.currentTime = percent * this.getDuration();
-  }
-
-  on(name, fn) {
-    if (name === 'ended') {
-      this.__onended__callbacks.push(fn);
-    }
-  }
-
-  __onended() {
-    this.__onended__callbacks.forEach(cb => { cb(); });
   }
 }
