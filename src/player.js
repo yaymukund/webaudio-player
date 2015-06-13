@@ -1,28 +1,59 @@
-import CorePlayer from './core-player';
+import AudioPlayer from './audio-player';
+import XhrPlayer from './xhr-player';
 
 export default class Player {
   constructor() {
-    this._player = new CorePlayer();
+    this.context = new AudioContext();
+
+    this.destination = this.context.createGain();
+    this.destination.gain.value = 1;
+    this.destination.connect(this.context.destination);
+    this.__onended__callbacks = [];
+
+    this.players = {
+      audio: new AudioPlayer(this.context, this.destination),
+      xhr: new XhrPlayer(this.context, this.destination)
+    };
+
+    this.players.audio.on('ended', this.__onended.bind(this));
+    this.players.xhr.on('ended', this.__onended.bind(this));
+    this.player = this.players.audio;
   }
 
-  play(url, when=0, offset=0) {
-    this._player.play(url, when, offset);
+  play(url) {
+    this.player.stop();
+
+    if (this.players.xhr.isCached(url)) {
+      this.player = this.players.xhr;
+    } else {
+      this.player = this.players.audio;
+    }
+
+    this.player.play(url);
   }
 
   pause() {
-    this._player.pause();
+    if (this.isPaused()) { return; }
+    this._isPaused = true;
+    this.context.suspend();
   }
 
   unpause() {
-    this._player.unpause();
+    if (!this.isPaused()) { return; }
+    this._isPaused = false;
+    this.context.resume();
+  }
+
+  isPaused() {
+    return this._isPaused;
   }
 
   setVolume(volume) {
-    this._player.setVolume(volume);
+    this.destination.gain.value = volume;
   }
 
   getVolume(volume) {
-    return this._player.getVolume(volume);
+    return this.destination.gain.value;
   }
 
   mute() {
@@ -36,26 +67,28 @@ export default class Player {
   }
 
   preload(url) {
-    this._player.preload(url);
+    this.players.xhr.preload(url);
   }
 
   getSeconds() {
-    return this._player.getSeconds();
+    return this.player.getSeconds();
   }
 
   getDuration() {
-    return this._player.getDuration();
-  }
-
-  isPaused() {
-    return this._player.isPaused();
+    return this.player.getDuration();
   }
 
   seekToPercent(percent) {
-    return this._player.seekToPercent(percent);
+    return this.player.seekToPercent(percent);
   }
 
   on(name, fn) {
-    return this._player.on(name, fn);
+    if (name === 'ended') {
+      this.__onended__callbacks.push(fn);
+    }
+  }
+
+  __onended() {
+    this.__onended__callbacks.forEach(cb => { cb(); });
   }
 }
