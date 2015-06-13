@@ -35,7 +35,7 @@ export default class XhrPlayer {
     this.source.buffer = this.buffer;
     this.source.connect(this.destination);
     this.source.start(0, offset);
-    this.startedAt = this.context.currentTime;
+    this.startedAt = this.context.currentTime - offset;
     this.source.onended = this.__onended.bind(this);
   }
 
