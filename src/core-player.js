@@ -35,19 +35,27 @@ export default class CorePlayer {
     return deferred.promise;
   }
 
-  _play(audioBuffer=null, when=0, offset=0) {
+  _play(buffer=null, when=0, offset=0) {
     this._stop(when);
 
-    audioBuffer = audioBuffer || this.bufferSource.buffer;
+    buffer = buffer || this.bufferSource.buffer;
 
-    this.bufferSource = this.audioContext.createBufferSource();
-    this.bufferSource.buffer = audioBuffer;
-    this.track.duration = this.bufferSource.buffer.duration;
+    let bufferSource = this.audioContext.createBufferSource();
+    bufferSource.buffer = buffer;
+    this.bufferSource = bufferSource;
+
+    this.track.duration = buffer.duration;
     this.track.startedAt = this.audioContext.currentTime - offset;
-    this.bufferSource.connect(this.gainNode);
-    this.bufferSource.start(when, offset);
-    this.bufferSource.onended = () => {
-      this.__onended_callbacks.forEach(cb => { cb(); });
+
+    bufferSource.connect(this.gainNode);
+    bufferSource.start(when, offset);
+
+    let self = this;
+
+    this.bufferSource.onended = function() {
+      if (self.bufferSource === bufferSource) {
+        self.__onended_callbacks.forEach(cb => { cb(); });
+      }
     };
   }
 
