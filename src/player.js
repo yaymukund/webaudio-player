@@ -13,12 +13,16 @@ export default class Player {
     this._player.pause();
   }
 
-  resume() {
-    this._player.resume();
+  unpause() {
+    this._player.unpause();
   }
 
   setVolume(volume) {
     this._player.setVolume(volume);
+  }
+
+  getVolume(volume) {
+    return this._player.getVolume(volume);
   }
 
   mute() {
@@ -41,6 +45,10 @@ export default class Player {
 
   getDuration() {
     return this._player.getDuration();
+  }
+
+  isPaused() {
+    return this._player.isPaused();
   }
 
   seekToPercent(percent) {

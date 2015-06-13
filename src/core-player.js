@@ -37,7 +37,7 @@ export default class CorePlayer {
 
   _play(buffer=null, when=0, offset=0) {
     this._stop(when);
-
+    this.unpause();
     buffer = buffer || this.bufferSource.buffer;
 
     let bufferSource = this.audioContext.createBufferSource();
@@ -54,6 +54,7 @@ export default class CorePlayer {
 
     this.bufferSource.onended = function() {
       if (self.bufferSource === bufferSource) {
+        self.pause();
         self.__onended_callbacks.forEach(cb => { cb(); });
       }
     };
@@ -105,10 +106,12 @@ export default class CorePlayer {
   }
 
   pause() {
+    this._isPaused = true;
     return this.audioContext.suspend();
   }
 
-  resume() {
+  unpause() {
+    this._isPaused = false;
     return this.audioContext.resume();
   }
 
@@ -123,5 +126,9 @@ export default class CorePlayer {
   seekToPercent(percent) {
     let seconds = percent * this.getDuration();
     this._play(null, 0, seconds);
+  }
+
+  isPaused() {
+    return this._isPaused;
   }
 }
