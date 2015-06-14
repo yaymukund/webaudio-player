@@ -99,6 +99,10 @@ export default class XhrPlayer {
   }
 
   preload(url) {
+    if (this.isCached(url)) {
+      return;
+    }
+
     fetch(url)
       .then(this._decode.bind(this))
       .then(buffer => {
