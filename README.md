@@ -13,7 +13,7 @@ let player = new Player();
 player.play('http://localhost:4200/test.mp3');
 ```
 
-## Interface
+## `Player`
 
 A player instance exposes the following methods:
 
