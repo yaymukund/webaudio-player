@@ -40,3 +40,7 @@ on(name, fn) // only `ended` event is supported.
 - [ ] test skipless playback using `<audio>`
 - [ ] let the user configure preload cache size
 - [ ] `preload` returns a `Promise` instance
+- [ ] support overriding `XMLHttpRequest`*
+
+* evaluate if this is even worth it given the webaudio api's
+  browser support.
