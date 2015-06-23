@@ -42,5 +42,5 @@ on(name, fn) // only `ended` event is supported.
 - [ ] `preload` returns a `Promise` instance
 - [ ] support overriding `XMLHttpRequest`*
 
-* evaluate if this is even worth it given the webaudio api's
+\* evaluate if this is even worth it given the webaudio api's
   browser support.
