@@ -5,10 +5,11 @@ uses `XMLHttpRequest`.
 
 ```js
 // Installation
-import { configure } from 'settings';
+import { configure } from 'webaudio-player/settings';
 configure({ RSVP: RSVP });
 
 // Usage
+import Player from 'webaudio-player/player';
 let player = new Player();
 player.play('http://localhost:4200/test.mp3');
 ```
