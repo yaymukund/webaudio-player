@@ -7,16 +7,16 @@
     <script src="http://rsvpjs-builds.s3.amazonaws.com/rsvp-latest.js"></script>
     <script src="dist/webaudio-player.js"></script>
     <script>
-      var configure = require('webaudio-player/settings').configure;
-      configure({ RSVP: RSVP });
+      var Player = require('webaudio-player/player').default,
+          player = new Player();
 
-      var Controls = require('webaudio-player/controls').default,
-          controls = new Controls();
-
-      controls.play('test.mp3');
+      player.play('test.mp3');
     </script>
   </head>
   <body>
-    <p>This is the test page.</p>
+    <p>
+      To test the player, open console and access the global
+      <code>player</code> object.
+    </p>
   </body>
 </html>

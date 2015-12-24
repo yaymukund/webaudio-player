@@ -1,45 +1,70 @@
-import AudioPlayer from './audio-player';
-import XhrPlayer from './xhr-player';
-import * as events from './events';
+import Cache from './cache';
+import EventEmitter from './event-emitter';
 
 export default class Player {
   constructor() {
-    this.context = new AudioContext();
-
-    this.destination = this.context.createGain();
-    this.destination.gain.value = 1;
-    this.destination.connect(this.context.destination);
-
-    this.players = {
-      audio: new AudioPlayer(this.context, this.destination),
-      xhr: new XhrPlayer(this.context, this.destination)
-    };
-
-    this.player = this.players.audio;
+    this._context = new AudioContext();
+    this._destination = this._context.createGain();
+    this._destination.gain.value = 1;
+    this._destination.connect(this._context.destination);
+    this._cache = new Cache();
+    this._emitter = new EventEmitter();
   }
 
   play(url) {
-    this.player.stop();
-
-    if (this.players.xhr.isCached(url)) {
-      this.player = this.players.xhr;
-    } else {
-      this.player = this.players.audio;
+    if (this._url === url) {
+      this.seekToPercent(0);
+      this._audio.play();
+      return;
     }
 
-    this.player.play(url);
+    this._unload();
+
+    this.preload(url).then(audio => {
+      this._audio = audio;
+      this._source = this._context.createMediaElementSource(audio);
+      this._source.connect(this._destination);
+
+      audio.addEventListener('ended', () => {
+        this._emitter.trigger('ended')
+      });
+
+      this._url = url;
+      audio.play();
+    });
+  }
+
+  preload(url) {
+    let audio = this._cache.get(url);
+
+    if (audio) {
+      return Promise.resolve(audio);
+    }
+
+    audio = new Audio();
+    audio.src = url;
+
+    return new Promise(resolve => {
+      audio.addEventListener('canplaythrough', () => resolve(audio));
+      audio.load();
+      this._cache.set(url, audio);
+    });
+  }
+
+  stop() {
+    this._audio.pause();
   }
 
   pause() {
     if (this.isPaused()) { return; }
     this._isPaused = true;
-    this.context.suspend();
+    this._context.suspend();
   }
 
   unpause() {
     if (!this.isPaused()) { return; }
     this._isPaused = false;
-    this.context.resume();
+    this._context.resume();
   }
 
   isPaused() {
@@ -47,40 +72,46 @@ export default class Player {
   }
 
   setVolume(volume) {
-    this.destination.gain.value = volume;
+    this._destination.gain.value = volume;
   }
 
   getVolume(volume) {
-    return this.destination.gain.value;
+    return this._destination.gain.value;
   }
 
   mute() {
-    this.oldVolume = this._player.getVolume();
+    this._oldVolume = this.getVolume();
     this.setVolume(0);
   }
 
   unmute() {
-    this.setVolume(this.oldVolume || 1);
+    this.setVolume(this._oldVolume || 1);
     this.oldVolume = null;
   }
 
-  preload(url) {
-    this.players.xhr.preload(url);
+  _unload() {
+    if (this._audio) {
+      this.stop();
+      this._audio.removeEventListener('ended');
+      this._audio.removeEventListener('canplaythrough');
+      this._url = null;
+      this._audio = null;
+    }
   }
 
   getSeconds() {
-    return this.player.getSeconds();
+    return (this._audio && this._audio.currentTime) || 0;
   }
 
   getDuration() {
-    return this.player.getDuration();
+    return (this._audio && this._audio.duration) || 0;
   }
 
   seekToPercent(percent) {
-    return this.player.seekToPercent(percent);
+    this._audio.currentTime = percent * this.getDuration();
   }
 
-  on(name, fn) {
-    events.on(name, fn);
+  on() {
+    this._emitter.on(...arguments);
   }
 }
