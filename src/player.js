@@ -14,45 +14,50 @@ export default class Player {
   play(url) {
     if (this._url === url) {
       this.seekToPercent(0);
-      this._audio.play();
+      this._source.mediaElement.play();
       return;
     }
 
     this._unload();
 
-    this.preload(url).then(audio => {
-      this._audio = audio;
-      this._source = this._context.createMediaElementSource(audio);
+    this.preload(url).then(source => {
+      this._source = source;
       this._source.connect(this._destination);
 
-      audio.addEventListener('ended', () => {
+      this._source.mediaElement.addEventListener('ended', () => {
         this._emitter.trigger('ended')
       });
 
       this._url = url;
-      audio.play();
+      this.play(url);
     });
   }
 
   preload(url) {
-    let audio = this._cache.get(url);
+    let source = this._cache.get(url);
 
-    if (audio) {
-      return Promise.resolve(audio);
+    if (source) {
+      return Promise.resolve(source);
     }
 
-    audio = new Audio();
+    let audio = new Audio();
     audio.src = url;
 
     return new Promise(resolve => {
-      audio.addEventListener('canplaythrough', () => resolve(audio));
+      let canplaythrough = () => {
+        audio.removeEventListener('canplaythrough', canplaythrough);
+        source = this._context.createMediaElementSource(audio);
+        this._cache.set(url, source);
+        resolve(source);
+      };
+
+      audio.addEventListener('canplaythrough', canplaythrough);
       audio.load();
-      this._cache.set(url, audio);
     });
   }
 
   stop() {
-    this._audio.pause();
+    this._source.mediaElement.pause();
   }
 
   pause() {
@@ -90,25 +95,23 @@ export default class Player {
   }
 
   _unload() {
-    if (this._audio) {
+    if (this._source) {
       this.stop();
-      this._audio.removeEventListener('ended');
-      this._audio.removeEventListener('canplaythrough');
       this._url = null;
-      this._audio = null;
+      this._source = null;
     }
   }
 
   getSeconds() {
-    return (this._audio && this._audio.currentTime) || 0;
+    return (this._source && this._source.mediaElement.currentTime) || 0
   }
 
   getDuration() {
-    return (this._audio && this._audio.duration) || 0;
+    return (this._source && this._source.mediaElement.duration) || 0;
   }
 
   seekToPercent(percent) {
-    this._audio.currentTime = percent * this.getDuration();
+    this._source.mediaElement.currentTime = percent * this.getDuration();
   }
 
   on() {
