@@ -19,8 +19,13 @@ export default class Player {
     }
 
     this._unload();
+    this._url = url;
 
     this.preload(url).then(source => {
+      if (this._url !== url) {
+        return;
+      }
+
       this._source = source;
       this._source.connect(this._destination);
 
@@ -28,7 +33,6 @@ export default class Player {
         this._emitter.trigger('ended')
       });
 
-      this._url = url;
       this.play(url);
     });
   }
