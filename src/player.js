@@ -11,6 +11,10 @@ export default class Player {
     this._emitter = new EventEmitter();
   }
 
+  getCacheDebugInformation() {
+    return this._cache.cache;
+  }
+
   play(url) {
     if (this._url === url) {
       this.seekToPercent(0);
