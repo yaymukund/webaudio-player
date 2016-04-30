@@ -8,6 +8,7 @@ export default class Player {
     this._destination.gain.value = 1;
     this._destination.connect(this._context.destination);
     this._cache = new Cache();
+    this._promises = new Cache();
     this._emitter = new EventEmitter();
   }
 
@@ -48,10 +49,16 @@ export default class Player {
       return Promise.resolve(source);
     }
 
+    let promise = this._promises.get(url);
+
+    if (promise) {
+      return promise;
+    }
+
     let audio = new Audio();
     audio.src = url;
 
-    return new Promise(resolve => {
+    promise = new Promise(resolve => {
       let canplaythrough = () => {
         audio.removeEventListener('canplaythrough', canplaythrough);
         source = this._context.createMediaElementSource(audio);
@@ -62,6 +69,9 @@ export default class Player {
       audio.addEventListener('canplaythrough', canplaythrough);
       audio.load();
     });
+
+    this._promises.set(url, promise);
+    return promise;
   }
 
   stop() {
