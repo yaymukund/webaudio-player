@@ -17,6 +17,10 @@ export default class Player {
   }
 
   play(url) {
+    if (this._context.state === 'suspended') {
+      this._context.resume();
+    }
+
     if (this._url === url) {
       this.seekToPercent(0);
       this._source.mediaElement.play();
